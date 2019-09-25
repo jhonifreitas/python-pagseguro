@@ -54,7 +54,7 @@ class PagSeguroPreApprovalNotificationResponse(XMLParser):
                        self).parse_xml(xml)
         if self.errors:
             return
-        transaction = parsed.get('transaction', {})
+        transaction = parsed.get('preApproval', {})
         for k, v in transaction.items():
             setattr(self, k, v)
 
@@ -150,6 +150,17 @@ class PagSeguroTransactionSearchResult(XMLParser):
         self.total_pages = search_result.get('totalPages', None)
         if self.total_pages is not None:
             self.total_pages = int(self.total_pages)
+
+
+class PagSeguroPreApprovalRequest(XMLParser):
+    def __getitem__(self, key):
+        getattr(self, key, None)
+
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalRequest, self).parse_xml(xml)
+        result = parsed.get('preApprovalRequest')
+        self.code = result.get('code', None)
+        self.date = parse_date(result.get('date'))
 
 
 class PagSeguroPreApproval(XMLParser):

@@ -11,6 +11,7 @@ from .parsers import (PagSeguroNotificationResponse,
                       PagSeguroPreApprovalPayment,
                       PagSeguroCheckoutResponse,
                       PagSeguroTransactionSearchResult,
+                      PagSeguroPreApprovalRequest,
                       PagSeguroPreApproval,
                       PagSeguroPreApprovalSearch)
 
@@ -159,6 +160,14 @@ class PagSeguro(object):
                 'final_date')
             params['preApprovalMaxTotalAmount'] = self.pre_approval.get(
                 'max_total_amount')
+            params['preApprovalMembershipFee'] = self.pre_approval.get(
+                'membership_fee')
+            params['preApprovalExpirationValue'] = self.pre_approval.get(
+                'expiration_value')
+            params['preApprovalExpirationUnit'] = self.pre_approval.get(
+                'expiration_unit')
+            params['preApprovalTrialPeriodDuration'] = self.pre_approval.get(
+                'trial_period_duration')
 
         self.data.update(params)
         self.clean_none_params()
@@ -240,6 +249,23 @@ class PagSeguro(object):
             url=self.config.PRE_APPROVAL_NOTIFICATION_URL % code)
         return PagSeguroPreApprovalNotificationResponse(
             response.content, self.config)
+
+    def pre_approval_request(self, **kwargs):
+        """ request pre approval plan creation """
+        self.build_checkout_params(**kwargs)
+        response = self.post(url=self.config.PRE_APPROVAL_REQUEST_URL)
+        return PagSeguroPreApprovalRequest(response.content, self.config)
+
+    def pre_approval_ask(self, **kwargs):
+        self.params = {
+            'sender': self.sender,
+            'paymentMethod': {
+                'creditCard': self.credit_card
+            }
+        }
+        self.params.update(**kwargs)
+        response = self.post(url=self.config.PRE_APPROVAL_PAYMENT_URL)
+        return response
 
     def pre_approval_ask_payment(self, **kwargs):
         """ ask form a subscribe payment """

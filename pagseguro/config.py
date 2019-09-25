@@ -26,6 +26,10 @@ class Config(dict):
                 base_url, version),
             PRE_APPROVAL_CANCEL_URL='{}{}pre-approvals/cancel/%s'.format(
                 base_url, version),
+            PRE_APPROVAL_REQUEST_URL='{}{}pre-approvals/request'.format(
+                base_url, version),
+            PRE_APPROVAL_REDIRECT_URL='{}{}pre-approvals/request.html'.format(
+                payment_host, version),
             SESSION_CHECKOUT_URL='{}{}'.format(
                 base_url, session_checkout_suffix),
             TRANSPARENT_CHECKOUT_URL='{}{}'.format(
