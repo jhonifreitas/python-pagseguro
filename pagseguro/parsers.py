@@ -158,6 +158,8 @@ class PagSeguroPreApprovalRequest(XMLParser):
 
     def parse_xml(self, xml):
         parsed = super(PagSeguroPreApprovalRequest, self).parse_xml(xml)
+        if self.errors:
+            return
         result = parsed.get('preApprovalRequest')
         self.code = result.get('code', None)
         self.date = parse_date(result.get('date'))
