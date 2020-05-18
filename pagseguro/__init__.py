@@ -35,9 +35,12 @@ class PagSeguro(object):
 
         self.config = Config(**config)
 
+        self.email = email
+        self.token = token
+
         self.data = {}
-        self.data['email'] = email
-        self.data['token'] = token
+        self.data['email'] = self.email
+        self.data['token'] = self.token
 
         if data and isinstance(data, dict):
             self.data.update(data)
