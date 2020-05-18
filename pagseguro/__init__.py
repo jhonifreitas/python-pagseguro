@@ -279,8 +279,8 @@ class PagSeguro(object):
         })
         headers = {
             'Content-Type': 'application/json',
-            'Accept': ('application/vnd.pagseguro.com.br.v1+json;',
-                       'charset=ISO-8859-1')
+            'Accept': 'application/vnd.pagseguro.com.br.v1+json;'\
+                      'charset=ISO-8859-1'
         }
         url = self.config.PRE_APPROVAL_URL % (self.email, self.token)
         response = self.post(url=url, headers=headers)
