@@ -214,3 +214,15 @@ class PagSeguroPreApprovalSearch(XMLParser):
         self.total_pages = search_result.get('totalPages', None)
         if self.total_pages is not None:
             self.total_pages = int(self.total_pages)
+
+
+class AttrDict(dict):
+
+    errors = None
+    transaction = {}
+
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+        if hasattr(self, 'code'):
+            self.transaction = {'code': self.code}

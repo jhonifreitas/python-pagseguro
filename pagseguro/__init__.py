@@ -1,4 +1,5 @@
 # coding: utf-8
+import json
 import logging
 import requests
 
@@ -13,7 +14,8 @@ from .parsers import (PagSeguroNotificationResponse,
                       PagSeguroTransactionSearchResult,
                       PagSeguroPreApprovalRequest,
                       PagSeguroPreApproval,
-                      PagSeguroPreApprovalSearch)
+                      PagSeguroPreApprovalSearch,
+                      AttrDict)
 
 logger = logging.getLogger()
 
@@ -215,13 +217,18 @@ class PagSeguro(object):
             value = value[len(self.reference_prefix):]
         self._reference = value
 
-    def get(self, url):
-        """ do a get transaction """
-        return requests.get(url, params=self.data, headers=self.config.HEADERS)
+    def _get_headers(self, headers):
+        return headers if headers else self.config.HEADERS
 
-    def post(self, url):
+    def get(self, url, headers=None):
+        """ do a get transaction """
+        return requests.get(url, params=self.data, headers=self._get_headers(
+            headers))
+
+    def post(self, url, headers=None):
         """ do a post request """
-        return requests.post(url, data=self.data, headers=self.config.HEADERS)
+        return requests.post(url, data=self.data, headers=self._get_headers(
+            headers))
 
     def checkout(self, transparent=False, **kwargs):
         """ create a pagseguro checkout """
@@ -257,15 +264,24 @@ class PagSeguro(object):
         return PagSeguroPreApprovalRequest(response.content, self.config)
 
     def pre_approval_ask(self, **kwargs):
-        self.params = {
+        """ ask form a subscribe payment """
+        self.data = json.dumps({
+            'plan': self.code,
+            'reference': self.reference,
             'sender': self.sender,
             'paymentMethod': {
+                'type': self.payment.get('method'),
                 'creditCard': self.credit_card
             }
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': ('application/vnd.pagseguro.com.br.v1+json;',
+                       'charset=ISO-8859-1')
         }
-        self.params.update(**kwargs)
-        response = self.post(url=self.config.PRE_APPROVAL_PAYMENT_URL)
-        return response
+        url = self.config.PRE_APPROVAL_URL % (self.email, self.token)
+        response = self.post(url=url, headers=headers)
+        return AttrDict(response.json())
 
     def pre_approval_ask_payment(self, **kwargs):
         """ ask form a subscribe payment """
@@ -363,3 +379,24 @@ class PagSeguro(object):
 
     def add_item(self, **kwargs):
         self.items.append(kwargs)
+
+    def generate_ticket(self):
+        data = {
+            "reference": self.reference,
+            "firstDueDate": self.ticket.get('firstDueDate'),
+            "numberOfPayments": self.ticket.get('numberOfPayments'),
+            "periodicity": self.ticket.get('periodicity', 'monthly'),
+            "amount": self.ticket.get('amount'),
+            "description": self.ticket.get('description'),
+            "customer": self.sender
+        }
+        if self.ticket.get('instructions'):
+            data.update({'instructions': self.ticket.get('instructions')})
+        if self.notification_url:
+            data.update({'notificationURL': self.notification_url})
+
+        self.data = json.dumps(data)
+        headers = {'Content-Type': 'application/json'}
+        url = self.config.TICKET_URL % (self.email, self.token)
+        response = self.post(url=url, headers=headers)
+        return AttrDict(response.json())

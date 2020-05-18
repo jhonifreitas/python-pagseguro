@@ -29,13 +29,13 @@ ou
 
 
 ```bash
-pip install -e git+https://github.com/rochacbruno/python-pagseguro#egg=pagseguro
+pip install -e git+https://github.com/jhonifreitas/python-pagseguro#egg=pagseguro
 ```
 
 ou
 
 ```
-git clone https://github.com/rochacbruno/python-pagseguro
+git clone https://github.com/jhonifreitas/python-pagseguro
 cd python-pagseguro
 pip install -r requirements.txt
 python setup.py install
@@ -260,7 +260,7 @@ A lista completa de valores pode ser conferida em  https://pagseguro.uol.com.br/
 
 ## Exemplo em Flask
 
-[FlaskSeguro](https://github.com/rochacbruno/python-pagseguro/tree/master/examples/flask)
+[FlaskSeguro](https://github.com/jhonifreitas/python-pagseguro/tree/master/examples/flask)
 by @shyba
 
 

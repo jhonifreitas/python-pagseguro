@@ -22,6 +22,10 @@ class Config(dict):
 
         # default config settings
         defaults = dict(
+            TICKET_URL='{}/recurring-payment/boletos?email=%s&token=%s'.format(
+                base_url),
+            PRE_APPROVAL_URL='{}/pre-approvals?email=%s&token=%s'.format(
+                base_url),
             PRE_APPROVAL_PAYMENT_URL='{}{}pre-approvals/payment'.format(
                 base_url, version),
             PRE_APPROVAL_CANCEL_URL='{}{}pre-approvals/cancel/%s'.format(
